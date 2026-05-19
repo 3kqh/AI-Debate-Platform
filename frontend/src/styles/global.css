@@ -1,0 +1,45 @@
+/* Global styles - extends Bootstrap */
+
+:root {
+  --bs-primary: #4f46e5;
+  --bs-primary-rgb: 79, 70, 229;
+  --color-proposition: #2563eb;
+  --color-opposition: #dc2626;
+  --color-host: #7c3aed;
+  --color-judge: #d97706;
+  --color-viewer: #6b7280;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Debate-specific utilities */
+.team-proposition {
+  color: var(--color-proposition);
+}
+
+.team-opposition {
+  color: var(--color-opposition);
+}
+
+.bg-proposition {
+  background-color: var(--color-proposition);
+  color: white;
+}
+
+.bg-opposition {
+  background-color: var(--color-opposition);
+  color: white;
+}
+
+/* Timer styles */
+.timer-warning {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
