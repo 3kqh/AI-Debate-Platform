@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Card, Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useAuthStore } from '@stores/authStore';
 import { authService } from '@services/authService';
 
 const registerSchema = z
@@ -22,9 +21,8 @@ const registerSchema = z
 type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
-  const { login } = useAuthStore();
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const {
@@ -37,12 +35,11 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterForm) => {
     setError('');
+    setSuccess('');
     setLoading(true);
     try {
-      const res = await authService.register(data);
-      const { user, accessToken, refreshToken } = res.data.data;
-      login(user, accessToken, refreshToken);
-      navigate('/', { replace: true });
+      await authService.register(data);
+      setSuccess('Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Đăng ký thất bại');
     } finally {
@@ -59,57 +56,31 @@ export default function RegisterPage() {
               <h3 className="text-center mb-4">Đăng ký</h3>
 
               {error && <Alert variant="danger">{error}</Alert>}
+              {success && <Alert variant="success">{success}</Alert>}
 
               <Form onSubmit={handleSubmit(onSubmit)}>
                 <Form.Group className="mb-3">
                   <Form.Label>Username</Form.Label>
-                  <Form.Control
-                    placeholder="username"
-                    isInvalid={!!errors.username}
-                    {...reg('username')}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.username?.message}
-                  </Form.Control.Feedback>
+                  <Form.Control placeholder="username" isInvalid={!!errors.username} {...reg('username')} />
+                  <Form.Control.Feedback type="invalid">{errors.username?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
                   <Form.Label>Email</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="you@example.com"
-                    isInvalid={!!errors.email}
-                    {...reg('email')}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.email?.message}
-                  </Form.Control.Feedback>
+                  <Form.Control type="email" placeholder="you@example.com" isInvalid={!!errors.email} {...reg('email')} />
+                  <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
                   <Form.Label>Mật khẩu</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="••••••"
-                    isInvalid={!!errors.password}
-                    {...reg('password')}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.password?.message}
-                  </Form.Control.Feedback>
+                  <Form.Control type="password" placeholder="••••••" isInvalid={!!errors.password} {...reg('password')} />
+                  <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
                   <Form.Label>Xác nhận mật khẩu</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="••••••"
-                    isInvalid={!!errors.confirmPassword}
-                    {...reg('confirmPassword')}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.confirmPassword?.message}
-                  </Form.Control.Feedback>
+                  <Form.Control type="password" placeholder="••••••" isInvalid={!!errors.confirmPassword} {...reg('confirmPassword')} />
+                  <Form.Control.Feedback type="invalid">{errors.confirmPassword?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Button type="submit" variant="primary" className="w-100" disabled={loading}>

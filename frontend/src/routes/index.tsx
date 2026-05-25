@@ -10,6 +10,10 @@ import { LoadingScreen } from '@components/common/LoadingScreen';
 const HomePage = lazy(() => import('@pages/HomePage'));
 const LoginPage = lazy(() => import('@pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('@pages/auth/RegisterPage'));
+const VerifyEmailPage = lazy(() => import('@pages/auth/VerifyEmailPage'));
+const ForgotPasswordPage = lazy(() => import('@pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@pages/auth/ResetPasswordPage'));
+const ChangePasswordPage = lazy(() => import('@pages/auth/ChangePasswordPage'));
 const ProfilePage = lazy(() => import('@pages/user/ProfilePage'));
 const LeaderboardPage = lazy(() => import('@pages/ranking/LeaderboardPage'));
 const LiveMatchesPage = lazy(() => import('@pages/matches/LiveMatchesPage'));
@@ -36,6 +40,9 @@ export const routes: RouteObject[] = [
       { index: true, element: withSuspense(HomePage) },
       { path: 'login', element: withSuspense(LoginPage) },
       { path: 'register', element: withSuspense(RegisterPage) },
+      { path: 'verify-email', element: withSuspense(VerifyEmailPage) },
+      { path: 'forgot-password', element: withSuspense(ForgotPasswordPage) },
+      { path: 'reset-password', element: withSuspense(ResetPasswordPage) },
       {
         path: 'profile/:userId',
         element: withSuspense(ProfilePage),
@@ -54,6 +61,7 @@ export const routes: RouteObject[] = [
           { path: 'rooms/create', element: withSuspense(CreateRoomPage) },
           { path: 'rooms/:roomId/lobby', element: withSuspense(LobbyPage) },
           { path: 'matchmaking', element: withSuspense(RankQueuePage) },
+          { path: 'change-password', element: withSuspense(ChangePasswordPage) },
         ],
       },
       {

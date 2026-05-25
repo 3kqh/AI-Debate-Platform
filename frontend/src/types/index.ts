@@ -71,6 +71,8 @@ export interface User {
   username: string;
   email: string;
   role: string;
+  authProvider: 'local' | 'google';
+  isEmailVerified: boolean;
   profile: UserProfile;
   stats: UserStats;
   ranking: UserRanking;
@@ -94,6 +96,34 @@ export interface RegisterRequest {
   email: string;
   password: string;
   confirmPassword: string;
+}
+
+export interface GoogleLoginRequest {
+  idToken: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface UpdateProfileRequest {
+  displayName?: string;
+  avatar?: string;
+  bio?: string;
+  school?: string;
+  club?: string;
 }
 
 // --- Room ---
