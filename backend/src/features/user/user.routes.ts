@@ -1,10 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { authenticate } from '../../middleware/auth.js';
+import { validate } from '../../middleware/validate.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { sendSuccess } from '../../utils/response.js';
 import { User } from '../../models/User.js';
-import { NotFoundError } from '../../utils/AppError.js';
+import { ForbiddenError, NotFoundError } from '../../utils/AppError.js';
 import type { AuthRequest } from '../../types/index.js';
+import { updateProfileSchema } from './user.schema.js';
 
 const router = Router();
 
@@ -32,26 +34,20 @@ router.get(
 router.put(
   '/:id/profile',
   authenticate,
+  validate(updateProfileSchema),
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
-    if (req.user!.userId !== id) {
-      return res.status(403).json({ success: false, message: 'Cannot edit other user profile' });
-    }
+    if (req.user!.userId !== id) throw new ForbiddenError('Cannot edit other user profile');
 
     const { displayName, bio, avatar, school, club } = req.body;
-    const user = await User.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          'profile.displayName': displayName,
-          'profile.bio': bio,
-          'profile.avatar': avatar,
-          'profile.school': school,
-          'profile.club': club,
-        },
-      },
-      { new: true, runValidators: true },
-    );
+    const $set: Record<string, string> = {};
+    if (displayName !== undefined) $set['profile.displayName'] = displayName;
+    if (bio !== undefined) $set['profile.bio'] = bio;
+    if (avatar !== undefined) $set['profile.avatar'] = avatar;
+    if (school !== undefined) $set['profile.school'] = school;
+    if (club !== undefined) $set['profile.club'] = club;
+
+    const user = await User.findByIdAndUpdate(id, { $set }, { new: true, runValidators: true });
 
     if (!user) throw new NotFoundError('User not found');
     sendSuccess(res, user, 'Profile updated');

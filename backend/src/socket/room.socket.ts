@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 
-export function registerRoomHandlers(io: Server, socket: Socket) {
+export function registerRoomHandlers(_io: Server, socket: Socket) {
   const userId = (socket as any).userId;
 
   // Join a debate room

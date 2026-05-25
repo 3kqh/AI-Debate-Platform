@@ -4,8 +4,15 @@ import bcrypt from 'bcryptjs';
 export interface IUser extends Document {
   username: string;
   email: string;
-  password: string;
+  password?: string;
   role: string;
+  authProvider: 'local' | 'google';
+  googleId?: string;
+  isEmailVerified: boolean;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
   profile: {
     displayName: string;
     avatar: string;
@@ -49,15 +56,26 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       minlength: 6,
-      select: false, // Don't include in queries by default
+      select: false,
     },
     role: {
       type: String,
       enum: ['admin', 'user'],
       default: 'user',
     },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
+    googleId: { type: String, sparse: true },
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, select: false },
+    emailVerificationExpires: { type: Date, select: false },
+    passwordResetToken: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
     profile: {
       displayName: { type: String, default: '' },
       avatar: { type: String, default: '' },
@@ -89,18 +107,21 @@ const userSchema = new Schema<IUser>(
 
 // Hash password before save
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password') || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
 // Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+  if (!this.password) return false;
   return bcrypt.compare(candidatePassword, this.password);
 };
 
 // Indexes
 userSchema.index({ 'ranking.elo': -1 });
 userSchema.index({ username: 'text', 'profile.displayName': 'text' });
+userSchema.index({ emailVerificationToken: 1 }, { sparse: true });
+userSchema.index({ passwordResetToken: 1 }, { sparse: true });
 
 export const User = mongoose.model<IUser>('User', userSchema);
