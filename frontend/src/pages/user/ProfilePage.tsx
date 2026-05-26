@@ -16,6 +16,8 @@ const profileSchema = z.object({
   club: z.string().max(100, 'Tối đa 100 ký tự'),
 });
 
+const fallbackAvatar = 'https://via.placeholder.com/160?text=User';
+
 type ProfileForm = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
@@ -81,7 +83,18 @@ export default function ProfilePage() {
         <Col lg={4}>
           <Card className="shadow-sm">
             <Card.Body className="text-center">
-              <Image src={profile.profile.avatar || 'https://via.placeholder.com/160'} roundedCircle width={160} height={160} className="object-fit-cover mb-3" />
+              <Image
+                src={profile.profile.avatar || fallbackAvatar}
+                roundedCircle
+                width={160}
+                height={160}
+                className="object-fit-cover mb-3"
+                onError={(event) => {
+                  if (event.currentTarget.src !== fallbackAvatar) {
+                    event.currentTarget.src = fallbackAvatar;
+                  }
+                }}
+              />
               <h3>{profile.profile.displayName || profile.username}</h3>
               <p className="text-muted mb-2">@{profile.username}</p>
               <Badge bg={profile.isEmailVerified ? 'success' : 'warning'}>{profile.isEmailVerified ? 'Email đã xác thực' : 'Chưa xác thực email'}</Badge>

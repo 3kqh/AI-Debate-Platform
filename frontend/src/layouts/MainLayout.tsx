@@ -9,8 +9,16 @@ export default function MainLayout() {
       <Container as="main" className="flex-grow-1 py-4">
         <Outlet />
       </Container>
-      <footer className="bg-light text-center py-3 border-top">
-        <small className="text-muted">AI Debate Platform &copy; 2026</small>
+      <footer className="text-center py-3">
+        <small className="text-muted">
+          <span className="text-neon-cyan">AI</span>{' '}
+          <span className="text-neon-purple">Debate</span>{' '}
+          <span className="text-muted">Platform</span>
+          {' — '}
+          <span style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '0.7rem' }}>
+            Powered by AI
+          </span>
+        </small>
       </footer>
     </div>
   );
