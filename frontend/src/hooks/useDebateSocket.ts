@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getSocket } from './useSocket';
 import { useDebateStore } from '@stores/debateStore';
 import type { ChatMessage, DebatePhase, RoomParticipant, SpeakerTurn } from '@/types';
@@ -7,6 +8,7 @@ import type { ChatMessage, DebatePhase, RoomParticipant, SpeakerTurn } from '@/t
  * Listen to debate-specific socket events and update store.
  */
 export function useDebateSocket(roomId: string | undefined) {
+  const { t } = useTranslation('errors');
   const {
     setPhase,
     setSpeaker,
@@ -65,13 +67,15 @@ export function useDebateSocket(roomId: string | undefined) {
 
     // Card issued
     socket.on('debate:card-issued', (data: { type: string; userId: string; reason: string }) => {
+      const cardLabel = data.type === 'yellow' ? t('yellowCard') : t('redCard');
+
       addMessage({
         _id: Date.now().toString(),
         roomId,
         senderId: 'system',
-        senderName: 'System',
+        senderName: t('system'),
         senderRole: 'host',
-        content: `⚠️ Thẻ ${data.type === 'yellow' ? 'vàng' : 'đỏ'}: ${data.reason}`,
+        content: `⚠️ ${cardLabel}: ${data.reason}`,
         type: 'system',
         isToxic: false,
         timestamp: new Date().toISOString(),
@@ -90,5 +94,5 @@ export function useDebateSocket(roomId: string | undefined) {
       socket.off('score:updated');
       socket.off('debate:card-issued');
     };
-  }, [roomId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [addMessage, roomId, setCEState, setParticipants, setPaused, setPhase, setScore, setSpeaker, setTimeRemaining, t]);
 }

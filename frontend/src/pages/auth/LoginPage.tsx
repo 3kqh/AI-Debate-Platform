@@ -4,6 +4,7 @@ import { Card, Form, Button, Alert, Container, Row, Col } from 'react-bootstrap'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@stores/authStore';
 import { authService } from '@services/authService';
 import { ENV } from '@/config/env';
@@ -21,23 +22,24 @@ declare global {
   }
 }
 
-const loginSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
-  password: z.string().min(6, 'Mật khẩu tối thiểu 6 ký tự'),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
-
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuthStore();
+  const { t } = useTranslation('auth');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleInitializedRef = useRef(false);
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
+
+  const loginSchema = z.object({
+    email: z.string().email(t('validation.emailInvalid')),
+    password: z.string().min(6, t('validation.passwordMin')),
+  });
+
+  type LoginForm = z.infer<typeof loginSchema>;
 
   const {
     register,
@@ -55,9 +57,9 @@ export default function LoginPage() {
       login(user, accessToken, refreshToken);
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Đăng nhập Google thất bại');
+      setError(err.response?.data?.message || t('login.googleFailed'));
     }
-  }, [from, login, navigate]);
+  }, [from, login, navigate, t]);
 
   useEffect(() => {
     if (!ENV.GOOGLE_CLIENT_ID) return;
@@ -103,7 +105,7 @@ export default function LoginPage() {
       login(user, accessToken, refreshToken);
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Đăng nhập thất bại');
+      setError(err.response?.data?.message || t('login.failed'));
     } finally {
       setLoading(false);
     }
@@ -115,41 +117,41 @@ export default function LoginPage() {
         <Col md={5}>
           <Card className="shadow-sm mt-5">
             <Card.Body className="p-4">
-              <h3 className="text-center mb-4">Đăng nhập</h3>
+              <h3 className="text-center mb-4">{t('login.title')}</h3>
 
               {error && <Alert variant="danger">{error}</Alert>}
 
               <Form onSubmit={handleSubmit(onSubmit)}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Email</Form.Label>
+                  <Form.Label>{t('fields.email')}</Form.Label>
                   <Form.Control type="email" placeholder="you@example.com" isInvalid={!!errors.email} {...register('email')} />
                   <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mb-2">
-                  <Form.Label>Mật khẩu</Form.Label>
+                  <Form.Label>{t('fields.password')}</Form.Label>
                   <Form.Control type="password" placeholder="••••••" isInvalid={!!errors.password} {...register('password')} />
                   <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
                 </Form.Group>
 
                 <div className="text-end mb-3">
-                  <Link to="/forgot-password">Quên mật khẩu?</Link>
+                  <Link to="/forgot-password">{t('login.forgotPassword')}</Link>
                 </div>
 
                 <Button type="submit" variant="primary" className="w-100" disabled={loading}>
-                  {loading ? 'Đang xử lý...' : 'Đăng nhập'}
+                  {loading ? t('login.submitting') : t('login.submit')}
                 </Button>
               </Form>
 
               {ENV.GOOGLE_CLIENT_ID && (
                 <>
-                  <div className="text-center text-muted my-3">hoặc</div>
+                  <div className="text-center text-muted my-3">{t('login.or')}</div>
                   <div ref={googleButtonRef} className="d-flex justify-content-center" />
                 </>
               )}
 
               <p className="text-center mt-3 mb-0">
-                Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+                {t('login.noAccount')} <Link to="/register">{t('register.submit')}</Link>
               </p>
             </Card.Body>
           </Card>

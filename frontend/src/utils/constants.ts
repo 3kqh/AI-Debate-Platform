@@ -1,4 +1,6 @@
 // Debate timing constants (seconds) — match 01_Debate_Rule.md
+import i18n from '@/i18n';
+
 export const TIMER = {
   PREP_INITIAL: 7 * 60, // 7 minutes
   SPEECH: 4 * 60, // 4 minutes
@@ -13,14 +15,18 @@ export const CE = {
 } as const;
 
 // Scoring criteria (01_Debate_Rule §13)
-export const SCORE_CRITERIA = [
-  { key: 'logic', label: 'Logic & Reasoning', max: 30 },
-  { key: 'rebuttal', label: 'Rebuttal Quality', max: 20 },
-  { key: 'evidence', label: 'Evidence & Examples', max: 15 },
-  { key: 'crossExam', label: 'Cross Examination', max: 15 },
-  { key: 'strategy', label: 'Strategy & Consistency', max: 10 },
-  { key: 'communication', label: 'Communication & Clarity', max: 10 },
-] as const;
+export function getScoreCriteria() {
+  return [
+    { key: 'logic', label: i18n.t('debate.criteria.logic', { ns: 'common' }), max: 30 },
+    { key: 'rebuttal', label: i18n.t('debate.criteria.rebuttal', { ns: 'common' }), max: 20 },
+    { key: 'evidence', label: i18n.t('debate.criteria.evidence', { ns: 'common' }), max: 15 },
+    { key: 'crossExam', label: i18n.t('debate.criteria.crossExam', { ns: 'common' }), max: 15 },
+    { key: 'strategy', label: i18n.t('debate.criteria.strategy', { ns: 'common' }), max: 10 },
+    { key: 'communication', label: i18n.t('debate.criteria.communication', { ns: 'common' }), max: 10 },
+  ] as const;
+}
+
+export const SCORE_CRITERIA = getScoreCriteria();
 
 // Speaker turn order (3v3)
 export const TURN_ORDER = [
